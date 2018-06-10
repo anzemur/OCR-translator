@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".TranslateActivity">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <TextView
+            android:paddingTop="3dp"
+            android:background="@drawable/border"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="5dp"
+            android:paddingLeft="3dp"
+            android:id="@+id/detected_text"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:text="Detected text:"
+            android:layout_marginStart="5dp"
+            android:paddingStart="3dp"
+            tools:ignore="RtlSymmetry" />
+
+        <EditText
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_below="@+id/detected_text"
+            android:id="@+id/edit_text_translate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp" />
+
+        <RelativeLayout
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginStart="5dp"
+            android:id="@+id/lin_lay"
+            android:layout_below="@+id/edit_text_translate"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:orientation="vertical"
+            android:gravity="bottom"
+            android:background="@drawable/border"
+            android:layout_marginEnd="5dp">
+
+            <TextView
+                android:paddingTop="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="5dp"
+                android:id="@+id/select_language"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:text="Select language:"
+                android:layout_marginStart="5dp" />
+
+            <EditText
+                android:layout_marginTop="0dp"
+                android:textSize="15sp"
+                android:id="@+id/search_edit_text"
+                android:layout_toRightOf="@+id/select_language"
+                android:layout_toLeftOf="@+id/search_icon"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_toEndOf="@+id/select_language"
+                android:layout_toStartOf="@+id/search_icon" />
+
+            <ImageView
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="5dp"
+                android:id="@+id/search_icon"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/ic_action_search_blue"
+                android:layout_alignParentRight="true"
+                android:layout_marginEnd="5dp" />
+
+
+
+        </RelativeLayout>
+
+
+        <ListView
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginEnd="10dp"
+            android:id="@+id/languages_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/lin_lay"
+            android:layout_marginStart="10dp"
+            android:layout_above="@+id/translate_button">
+
+
+        </ListView>
+
+        <Button
+            android:background="@drawable/border"
+            android:id="@+id/translate_button"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginEnd="5dp"
+            android:text="Translate"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="5dp"
+            android:layout_marginBottom="5dp"/>
+
+
+    </RelativeLayout>
+
+
+
+
+</android.support.constraint.ConstraintLayout>
