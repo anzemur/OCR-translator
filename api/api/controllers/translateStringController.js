@@ -16,6 +16,7 @@ exports.translateString = function (req, res) {
   translate(textToTranslate, {to: getCode(languageTo)}).then(response => {
     var textModel = new TextModel();
     textModel.translated_text = response.text;
+
     res.send(textModel);
 
   }).catch(err => {
@@ -134,6 +135,8 @@ var langs = {
     'yo': 'Yoruba',
     'zu': 'Zulu'
 };
+
+
 
 /**
  * Returns the ISO 639-1 code of the desiredLang – if it is supported by Google Translate
