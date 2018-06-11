@@ -1,5 +1,5 @@
 # OCR-Google-Translate-app
-Android app that with the help of OpenCV detects the text in a image and format it to a string. Then if you wish to, you can translate it to any language that Google Tranlate supports.
+Android app that with the help of OpenCV (using SVM algorithm) detects the text in a image and format it to a string. Then if you wish to, you can translate it to any language that Google Tranlate supports.
 
 ## Feautures
 
