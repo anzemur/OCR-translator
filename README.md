@@ -10,7 +10,7 @@ Android app that with the help of OpenCV detects the text in a image and format 
 ## API usage
 * ### API URL: https://ocr-google-translate-api.herokuapp.com/api/v1
 
-# Request : TranslateText (POST)
+### Request : TranslateText (POST)
 
 * Headers:
   * 'Content-Type' : 'application/x-www-form-urlencoded'
