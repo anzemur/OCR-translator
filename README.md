@@ -7,8 +7,12 @@ Android app that with the help of OpenCV detects the text in a image and format 
 * Choose an image from gallery and extract whole block of text, line or a word from it. You can translate that text to a choosen language.
 * Translate your written text.
 
+
+
 ## API usage
 * ### API URL: https://ocr-google-translate-api.herokuapp.com/api/v1
+
+
 
 ### Request : TranslateText (POST)
 
@@ -23,10 +27,14 @@ Android app that with the help of OpenCV detects the text in a image and format 
   * 'language' -> String that you want to translate.
 
 
+
+
 ## Built With
 
 * [google-translate-api](https://www.npmjs.com/package/google-translate-api)
 * [OpenCV 3.41](https://opencv.org/)
+
+
 
 
 ## License
