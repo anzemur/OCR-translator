@@ -249,10 +249,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @SuppressLint("ShowToast")
+
     private void RequestRuntimePermissionCamera() {
         if(ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.CAMERA)) {
-            Toast.makeText(this, "Camera permission allows us to access camera.", Toast.LENGTH_SHORT);
+            Toast.makeText(this, "Camera permission allows us to access camera.", Toast.LENGTH_SHORT).show();
 
         } else {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CAMERA}, RequestPermissionCodeCamera);
@@ -260,10 +260,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @SuppressLint("ShowToast")
+
     private void RequestRuntimePermissionWriteStorage() {
         if(ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            Toast.makeText(this, "Write storage permission allows us to write data to storage.", Toast.LENGTH_SHORT);
+            Toast.makeText(this, "Write storage permission allows us to write data to storage.", Toast.LENGTH_SHORT).show();
 
         } else {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, RequestPermissionCodeStorageWrite);
@@ -272,10 +272,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @SuppressLint("ShowToast")
+
     private void RequestRuntimePermissionReadStorage() {
         if(ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            Toast.makeText(this, "Read storage permission allows us to read data from storage.", Toast.LENGTH_SHORT);
+            Toast.makeText(this, "Read storage permission allows us to read data from storage.", Toast.LENGTH_SHORT).show();
 
         } else {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, RequestPermissionCodeStorageRead);
@@ -284,16 +284,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @SuppressLint("ShowToast")
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case RequestPermissionCodeCamera: {
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, "Permission granted.", Toast.LENGTH_SHORT);
+                    Toast.makeText(this, "Permission granted.", Toast.LENGTH_SHORT).show();
 
                 } else {
-                    Toast.makeText(this, "Permission denied.", Toast.LENGTH_SHORT);
+                    Toast.makeText(this, "Permission denied.", Toast.LENGTH_SHORT).show();
 
                 }
                 break;
@@ -301,10 +301,10 @@ public class MainActivity extends AppCompatActivity {
 
             case RequestPermissionCodeStorageWrite: {
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, "Permission granted.", Toast.LENGTH_SHORT);
+                    Toast.makeText(this, "Permission granted.", Toast.LENGTH_SHORT).show();
 
                 } else {
-                    Toast.makeText(this, "Permission denied.", Toast.LENGTH_SHORT);
+                    Toast.makeText(this, "Permission denied.", Toast.LENGTH_SHORT).show();
 
                 }
                 break;
@@ -312,10 +312,10 @@ public class MainActivity extends AppCompatActivity {
 
             case RequestPermissionCodeStorageRead: {
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, "Permission granted.", Toast.LENGTH_SHORT);
+                    Toast.makeText(this, "Permission granted.", Toast.LENGTH_SHORT).show();
 
                 } else {
-                    Toast.makeText(this, "Permission denied.", Toast.LENGTH_SHORT);
+                    Toast.makeText(this, "Permission denied.", Toast.LENGTH_SHORT).show();
 
                 }
                 break;
@@ -428,7 +428,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @SuppressLint("ShowToast")
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
@@ -498,7 +498,7 @@ public class MainActivity extends AppCompatActivity {
 
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
-                Toast.makeText(this, "Error: " + error + " Please try again.", Toast.LENGTH_SHORT);
+                Toast.makeText(this, "Error: " + error + " Please try again.", Toast.LENGTH_SHORT).show();
             }
 
         }
@@ -522,7 +522,6 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-        @SuppressLint("ShowToast")
         @Override
         protected String doInBackground(String... params) {
 
@@ -534,7 +533,7 @@ public class MainActivity extends AppCompatActivity {
                 detectedText = trainAndDetect(srcImg.getNativeObjAddr(), readMatClass.getNativeObjAddr(), readMatImg.getNativeObjAddr());
 
             } else {
-                Toast.makeText(MainActivity.this, "One of the parameters was not loaded successfully. Please try again.", Toast.LENGTH_SHORT);
+                Toast.makeText(MainActivity.this, "One of the parameters was not loaded successfully. Please try again.", Toast.LENGTH_SHORT).show();
 
             }
 
@@ -542,7 +541,7 @@ public class MainActivity extends AppCompatActivity {
             return detectedText;
         }
 
-        @SuppressLint("ShowToast")
+
         @Override
         protected void onPostExecute(String result) {
 
@@ -551,24 +550,29 @@ public class MainActivity extends AppCompatActivity {
 
             System.out.println(result);
 
-            if(result.equals("")) {
-                Toast.makeText(MainActivity.this, "No text detected. Please try again.", Toast.LENGTH_SHORT);
+            switch (result) {
+                case "":
+                    Toast.makeText(MainActivity.this, "No text detected. Please try again.", Toast.LENGTH_SHORT).show();
 
-            } else if(result.equals("error: one of matrices not defined!")){
-                Toast.makeText(MainActivity.this, "One of the parameters was not loaded successfully. Please try again.", Toast.LENGTH_SHORT);
+                    break;
+                case "error: one of matrices not defined!":
+                    Toast.makeText(MainActivity.this, "One of the parameters was not loaded successfully. Please try again.", Toast.LENGTH_SHORT).show();
 
-            } else if(result.equals("error: one of matrices is not continuous!")){
-                Toast.makeText(MainActivity.this, "One of the parameters was not loaded successfully. Please try again.", Toast.LENGTH_SHORT);
+                    break;
+                case "error: one of matrices is not continuous!":
+                    Toast.makeText(MainActivity.this, "One of the parameters was not loaded successfully. Please try again.", Toast.LENGTH_SHORT).show();
 
-            } else {
+                    break;
+                default:
 
-                System.out.println(result);
-                System.out.println(result.toLowerCase());
+                    System.out.println(result);
+                    System.out.println(result.toLowerCase());
 
-                Intent intent = new Intent(MainActivity.this, TranslateActivity.class);
-                intent.putExtra("detectedText", result.toLowerCase());
-                startActivity(intent);
+                    Intent intent = new Intent(MainActivity.this, TranslateActivity.class);
+                    intent.putExtra("detectedText", result.toLowerCase());
+                    startActivity(intent);
 
+                    break;
             }
 
         }

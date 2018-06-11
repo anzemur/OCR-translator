@@ -40,4 +40,7 @@ dependencies {
     compile project(':openCVLibrary341')
     compile 'com.googlecode.json-simple:json-simple:1.1'
     compile 'com.theartofdev.edmodo:android-image-cropper:2.5.+'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+    compile 'com.squareup.retrofit2:retrofit:2.4.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
 }
