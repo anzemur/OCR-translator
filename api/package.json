@@ -1,0 +1,24 @@
+{
+  "name": "googletranslateapi",
+  "version": "1.0.0",
+  "description": "Api for google-translate-api npm package.",
+  "main": "index.js",
+  "scripts": {
+	"start": "node index.js"
+  },
+  "keywords": [
+    "api",
+    "rest",
+    "google-translate"
+  ],
+  "author": "Anze Mur",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.16.3",
+    "google-translate-api": "^2.3.0",
+    "mongoose": "^5.1.4"
+  },
+  "devDependencies": {
+    "nodemon": "^1.17.5"
+  }
+}
