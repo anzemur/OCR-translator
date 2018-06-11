@@ -34,15 +34,15 @@ public:
 
     vector<Point> ptContour;
     Rect boundingRect;
-    float fltArea;
+    float floatArea;
 
 
     /**
      * Check if contour is valid-> has enough of data.
      * @return true if it is
      */
-    bool checkIfContourIsValid() {
-        return fltArea >= VALID_CONTOUR_AREA;
+    bool isValid() {
+        return floatArea >= VALID_CONTOUR_AREA;
     }
 
 
@@ -52,7 +52,7 @@ public:
      * @param right
      * @return true if left contour is positioned left of right contour
      */
-    static bool sortByBoundingRectXPosition(const DataContour& left, const DataContour& right) {
+    static bool sortRectX(const DataContour &left, const DataContour &right) {
 
         return(left.boundingRect.x  < right.boundingRect.x );
     }
@@ -63,7 +63,7 @@ public:
      * @param right
      * @return true if left contour is positioned below right contour
      */
-    static bool sortByBoundingRectYPosition(const DataContour& left, const DataContour& right) {
+    static bool sortRectY(const DataContour &left, const DataContour &right) {
 
         return(left.boundingRect.y  < right.boundingRect.y);
     }
@@ -175,20 +175,20 @@ Java_com_example_murg_googleocrtranslator_MainActivity_trainAndDetect(JNIEnv *en
     /* Init matrices that we will need in the future */
     Mat matGrayscale;
     Mat matBlurred;
-    Mat matThresh;
+    Mat matThreshold;
 
 
     cvtColor(inputImage, matGrayscale, CV_BGR2GRAY);
 
-
+    /* Aplly gaussianBlur*/
     GaussianBlur( matGrayscale,
                   matBlurred,
                   Size(5, 5),
                   0);
 
-
+    /* Aplly treshold*/
     adaptiveThreshold( matBlurred,
-                       matThresh,
+                       matThreshold,
                        255,
                        ADAPTIVE_THRESH_GAUSSIAN_C,
                        THRESH_BINARY_INV,
@@ -236,7 +236,7 @@ Java_com_example_murg_googleocrtranslator_MainActivity_trainAndDetect(JNIEnv *en
             Rect currentLine = boundingRect(lineContours[i]);
 
             Mat textRow;
-            textRow = matThresh(currentLine);
+            textRow = matThreshold(currentLine);
 
 
             Mat textRowCopy;
@@ -254,7 +254,7 @@ Java_com_example_murg_googleocrtranslator_MainActivity_trainAndDetect(JNIEnv *en
                           CHAIN_APPROX_SIMPLE);
 
 
-            std::vector<DataContour> allContoursWithData;
+            std::vector<DataContour> contoursWithData;
             std::vector<DataContour> validContoursWithData;
 
 
@@ -264,19 +264,21 @@ Java_com_example_murg_googleocrtranslator_MainActivity_trainAndDetect(JNIEnv *en
                 DataContour contourWithData;
                 contourWithData.ptContour = potencialContour[i];
                 contourWithData.boundingRect = boundingRect(contourWithData.ptContour);
-                contourWithData.fltArea = static_cast<float>(contourArea(contourWithData.ptContour));
-                allContoursWithData.push_back(contourWithData);
+                contourWithData.floatArea = static_cast<float>(contourArea(contourWithData.ptContour));
+
+                contoursWithData.push_back(contourWithData);
             }
 
             /* And single out the contours that are useful */
-            for (int i = 0; i < allContoursWithData.size(); i++) {
-                if (allContoursWithData[i].checkIfContourIsValid())
-                    validContoursWithData.push_back(allContoursWithData[i]);
+            for (int i = 0; i < contoursWithData.size(); i++) {
+                if (contoursWithData[i].isValid())
+                    validContoursWithData.push_back(contoursWithData[i]);
 
             }
 
             /* Sort the contours in current line from left to right */
-            std::sort(validContoursWithData.begin(), validContoursWithData.end(), DataContour::sortByBoundingRectXPosition);
+            std::sort(validContoursWithData.begin(), validContoursWithData.end(),
+                      DataContour::sortRectX);
 
 
             /* Get the char width mean for spaces computation. */
@@ -288,25 +290,25 @@ Java_com_example_murg_googleocrtranslator_MainActivity_trainAndDetect(JNIEnv *en
 
             for (int i = 0; i < validContoursWithData.size(); i++) {
 
-                Mat matROI = textRow(validContoursWithData[i].boundingRect);
+                Mat ROI = textRow(validContoursWithData[i].boundingRect);
 
 
-                Mat matROIResized;
-                resize(matROI, matROIResized, Size(IMAGE_WIDTH, IMAGE_HEIGHT));
+                Mat ROIResized;
+                resize(ROI, ROIResized, Size(IMAGE_WIDTH, IMAGE_HEIGHT));
 
-                Mat matROIFloat;
-                matROIResized.convertTo(matROIFloat, CV_32FC1);
+                Mat ROIFloat;
+                ROIResized.convertTo(ROIFloat, CV_32FC1);
 
-                Mat matROIFlattenedFloat = matROIFloat.reshape(1, 1);
+                Mat ROIFlattenedFloat = ROIFloat.reshape(1, 1);
 
-                Mat matCurrentChar(0, 0, CV_32F);
+                Mat currentChar(0, 0, CV_32F);
 
                 /* Use SVM to find the most similar char */
-                matROIFlattenedFloat.reshape(1, 1);
-                svm->predict(matROIFlattenedFloat, matCurrentChar);
+                ROIFlattenedFloat.reshape(1, 1);
+                svm->predict(ROIFlattenedFloat, currentChar);
 
 
-                float fltCurrentChar = (float) matCurrentChar.at<float>(0, 0);
+                float fltCurrentChar = (float) currentChar.at<float>(0, 0);
                 cout << char(int(fltCurrentChar));
 
                 /* Add char to the output text.  */
@@ -345,7 +347,7 @@ Java_com_example_murg_googleocrtranslator_MainActivity_trainAndDetect(JNIEnv *en
      *
      *
     Mat1f horizontalProjection;
-    reduce(matThresh, horizontalProjection, 1, CV_REDUCE_AVG);
+    reduce(matThreshold, horizontalProjection, 1, CV_REDUCE_AVG);
 
     float treshHold = 0;
     Mat1b hist = horizontalProjection <= treshHold;
@@ -355,7 +357,7 @@ Java_com_example_murg_googleocrtranslator_MainActivity_trainAndDetect(JNIEnv *en
     int count = 0;
     bool isSpace = false;
 
-    for (int i = 0; i < matThresh.rows; ++i) {
+    for (int i = 0; i < matThreshold.rows; ++i) {
         if (!isSpace) {
             if (hist(i)) {
                 isSpace = true;
@@ -387,7 +389,7 @@ Java_com_example_murg_googleocrtranslator_MainActivity_trainAndDetect(JNIEnv *en
                 pTopLeft.x = 0;
                 pTopLeft.y = 0;
 
-                pBottomRight.x = matThresh.cols;
+                pBottomRight.x = matThreshold.cols;
                 pBottomRight.y = yCoordinates[i];
 
 
@@ -395,7 +397,7 @@ Java_com_example_murg_googleocrtranslator_MainActivity_trainAndDetect(JNIEnv *en
                 pTopLeft.x = 0;
                 pTopLeft.y = yCoordinates[i];
 
-                pBottomRight.x = matThresh.cols;
+                pBottomRight.x = matThreshold.cols;
                 pBottomRight.y = yCoordinates[i + 1];
 
 
@@ -403,100 +405,14 @@ Java_com_example_murg_googleocrtranslator_MainActivity_trainAndDetect(JNIEnv *en
 
             Rect rowRect(pTopLeft, pBottomRight);
             Mat textRow;
-            textRow = matThresh(rowRect);
+            textRow = matThreshold(rowRect);
 
 
             Mat textRowCopy;
             textRowCopy = textRow.clone();
 
+            -||-
 
-            std::vector<std::vector<Point> > ptContours;
-            std::vector<Vec4i> v4iHierarchy;
-
-
-            findContours( textRowCopy,
-                          ptContours,
-                          v4iHierarchy,
-                          RETR_EXTERNAL,
-                          CHAIN_APPROX_SIMPLE);
-
-
-            std::vector<DataContour> allContoursWithData;
-            std::vector<DataContour> validContoursWithData;
-
-
-
-            for (int i = 0; i < ptContours.size(); i++) {
-                DataContour contourWithData;
-                contourWithData.ptContour = ptContours[i];
-                contourWithData.boundingRect = boundingRect(contourWithData.ptContour);
-                contourWithData.fltArea = contourArea(contourWithData.ptContour);
-                allContoursWithData.push_back(contourWithData);
-            }
-
-
-            for (int i = 0; i < allContoursWithData.size(); i++) {
-                if (allContoursWithData[i].checkIfContourIsValid())
-                    validContoursWithData.push_back(allContoursWithData[i]);
-
-            }
-
-            std::sort(validContoursWithData.begin(), validContoursWithData.end(), DataContour::sortByBoundingRectXPosition);
-
-
-
-            int meanWidthChars = 0;
-            if (validContoursWithData.size() != 0) {
-                meanWidthChars = getMeanWidth(validContoursWithData);
-                std::cout << "\n\n" << "MEAN = " << meanWidthChars << "\n\n";
-            }
-
-            for (int i = 0; i < validContoursWithData.size(); i++) {
-
-                Mat matROI = textRow(validContoursWithData[i].boundingRect);
-
-
-                Mat matROIResized;
-                resize(matROI, matROIResized, Size(IMAGE_WIDTH, IMAGE_HEIGHT));
-
-                Mat matROIFloat;
-                matROIResized.convertTo(matROIFloat, CV_32FC1);
-
-                Mat matROIFlattenedFloat = matROIFloat.reshape(1, 1);
-
-                Mat matCurrentChar(0, 0, CV_32F);
-
-
-                matROIFlattenedFloat.reshape(1, 1);
-                svm->predict(matROIFlattenedFloat, matCurrentChar);
-
-
-                float fltCurrentChar = (float) matCurrentChar.at<float>(0, 0);
-                cout << char(int(fltCurrentChar));
-
-
-                outputText = outputText + char(int(fltCurrentChar));
-
-                if (i + 1 < validContoursWithData.size()) {
-                    int currWidthX = validContoursWithData[i].boundingRect.x +
-                                     validContoursWithData[i].boundingRect.width;
-                    int nextWidthX = validContoursWithData[i + 1].boundingRect.x;
-
-                    std::cout << "\n\n" << "Xcurr = " << currWidthX << "\n\n";
-                    std::cout << "Xnext = " << nextWidthX << "\n\n";
-                    std::cout << "NORM = " << abs(currWidthX - nextWidthX) << "\n\n";
-                    std::cout << "MEAN = " << meanWidthChars * 2 << "\n\n";
-
-
-                    if (abs(currWidthX - nextWidthX) >= meanWidthChars / 2) {
-                        outputText = outputText + " ";
-                    }
-
-
-                } else if (i == validContoursWithData.size() - 1) {
-                    outputText = outputText + " ";
-                }
-            }
         }
 
 
@@ -505,12 +421,12 @@ Java_com_example_murg_googleocrtranslator_MainActivity_trainAndDetect(JNIEnv *en
     } else {
         /*If we didn' find any lines of text */
 
-        Mat matThreshCopy = matThresh.clone();
+        Mat matThresholdCopy = matThreshold.clone();
 
         vector<std::vector<Point> > potencialContour;
         vector<Vec4i> v4iHierarchy;
 
-        findContours(matThreshCopy,
+        findContours(matThresholdCopy,
                      potencialContour,
                      v4iHierarchy,
                      RETR_EXTERNAL,
@@ -518,7 +434,7 @@ Java_com_example_murg_googleocrtranslator_MainActivity_trainAndDetect(JNIEnv *en
 
 
 
-        vector<DataContour> allContoursWithData;
+        vector<DataContour> contoursWithData;
         vector<DataContour> validContoursWithData;
 
 
@@ -528,17 +444,18 @@ Java_com_example_murg_googleocrtranslator_MainActivity_trainAndDetect(JNIEnv *en
             DataContour contourWithData;
             contourWithData.ptContour = potencialContour[i];
             contourWithData.boundingRect = boundingRect(contourWithData.ptContour);
-            contourWithData.fltArea = static_cast<float>(cv::contourArea(contourWithData.ptContour));
-            allContoursWithData.push_back(contourWithData);
+            contourWithData.floatArea = static_cast<float>(cv::contourArea(contourWithData.ptContour));
+
+            contoursWithData.push_back(contourWithData);
         }
 
-        for (int i = 0; i < allContoursWithData.size(); i++) {
-            if (allContoursWithData[i].checkIfContourIsValid()) {
-                validContoursWithData.push_back(allContoursWithData[i]);
+        for (int i = 0; i < contoursWithData.size(); i++) {
+            if (contoursWithData[i].isValid()) {
+                validContoursWithData.push_back(contoursWithData[i]);
             }
         }
 
-        sort(validContoursWithData.begin(), validContoursWithData.end(), DataContour::sortByBoundingRectXPosition);
+        sort(validContoursWithData.begin(), validContoursWithData.end(), DataContour::sortRectX);
 
         double meanWidthChars = 0;
         if (validContoursWithData.size() != 0) {
@@ -552,7 +469,7 @@ Java_com_example_murg_googleocrtranslator_MainActivity_trainAndDetect(JNIEnv *en
 
 
 
-            Mat matROI = matThresh(validContoursWithData[i].boundingRect);
+            Mat matROI = matThreshold(validContoursWithData[i].boundingRect);
 
             Mat matROIResized;
             resize(matROI, matROIResized, Size(IMAGE_WIDTH, IMAGE_HEIGHT));

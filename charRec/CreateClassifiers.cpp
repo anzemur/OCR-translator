@@ -1,7 +1,8 @@
-#include<opencv2/core/core.hpp>
-#include<opencv2/highgui/highgui.hpp>
 #include<opencv2/imgproc/imgproc.hpp>
 #include<opencv2/ml/ml.hpp>
+#include<opencv2/core/core.hpp>
+#include<opencv2/highgui/highgui.hpp>
+
 
 #include<iostream>
 #include<vector>
@@ -39,12 +40,14 @@ int main() {
 
 
 	/* Iterate trough folder and save images to the classification files*/
-	for (int i = 10; i <= NUMBER_OF_CHARS; i++) {
+	for (int i = 0; i <= NUMBER_OF_CHARS; i++) {
 		int currentChar = charsToLearn.at(i);
 		char learnedChar = charsToLearn.at(i);
 
 
 		for (int j = 0; j < NUMBER_OF_TRAINING_SAMPLES; j++) {
+
+			/* Create the path to the folder */
 			string path = "Fonts/";
 			path.append(to_string(i));
 			path.append("/");
@@ -52,14 +55,15 @@ int main() {
 			path.append(".png");
 
 
+			/* Init matrices for image processing */
 			Mat trainImg;        
-			Mat imgGrayscale;               
-			Mat imgBlurred;                 
-			Mat imgThresh;                  
-			Mat imgThreshCopy;              
-
-			vector<vector<Point> > potencialContours;        
-			vector<Vec4i> v4iHierarchy;                    
+			Mat matGrayscale;               
+			Mat matBlurred;                 
+			Mat matThreshold;                  
+			Mat matThresholdCopy;              
+		       
+			vector<Vec4i> v4iHierarchy;  
+			vector<vector<Point> > potencialContours;
 
 
 			trainImg = imread(path);
@@ -72,16 +76,18 @@ int main() {
 				return(0);                                                  
 			}
 
-			cvtColor(trainImg, imgGrayscale, CV_BGR2GRAY);        
+			/* Transform to grayscale */
+			cvtColor(trainImg, matGrayscale, CV_BGR2GRAY);        
 
-			GaussianBlur(imgGrayscale,              
-				imgBlurred,                             
+			/* Aplly gaussianBlur*/
+			GaussianBlur(matGrayscale,              
+				matBlurred,                             
 				Size(5, 5),                         
 				0);                                     
 
-														
-			adaptiveThreshold(imgBlurred,           
-				imgThresh,                              
+			/* Aplly treshold*/
+			adaptiveThreshold(matBlurred,           
+				matThreshold,                              
 				255,                                    
 				ADAPTIVE_THRESH_GAUSSIAN_C,         
 				THRESH_BINARY_INV,                  
@@ -89,28 +95,34 @@ int main() {
 				2);                                     
 
 														
-			imgThreshCopy = imgThresh.clone();          
+			matThresholdCopy = matThreshold.clone();          
 
-			findContours(imgThreshCopy,             
+			/* Find the contour with potencial data -> not final*/
+			findContours(matThresholdCopy,             
 				potencialContours,                             
 				v4iHierarchy,                          
 				RETR_EXTERNAL,                      
 				CHAIN_APPROX_SIMPLE);               
 
-			for (int i = 0; i < potencialContours.size(); i++) {                           
+			for (int i = 0; i < potencialContours.size(); i++) {   
+
+				/* Find the contours with valid data -> based on number of non zero pixels*/
 				if (contourArea(potencialContours[i]) > VALID_CONTOUR_AREA) {    
 
-					Rect boundingRect1 = boundingRect(potencialContours[i]);               
-					Mat matROI = imgThresh(boundingRect1);           
+					Rect foundRect = boundingRect(potencialContours[i]);               
+					/* Select the Region Of Interest -> ROI */
+					Mat ROI = matThreshold(foundRect);           
 
-					Mat matROIResized;
-					resize(matROI, matROIResized, Size(IMAGE_WIDTH, IMAGE_HEIGHT));     
-					classificationInts.push_back(currentChar);
-
-					Mat matImageFloatFirst;                          
-					matROIResized.convertTo(matImageFloatFirst, CV_32FC1);
-					Mat matImageFlattenedFloatFirst = matImageFloatFirst.reshape(1, 1);       
+					/* Resize ROI to the right size and save it to the images */
+					Mat ROIResized;
+					resize(ROI, ROIResized, Size(IMAGE_WIDTH, IMAGE_HEIGHT));     
+					Mat ROIfloats;                          
+					ROIResized.convertTo(ROIfloats, CV_32FC1);
+					Mat matImageFlattenedFloatFirst = ROIfloats.reshape(1, 1);       
 					imagesFloats.push_back(matImageFlattenedFloatFirst);
+
+					/* Save current char, to the classifications*/
+					classificationInts.push_back(currentChar);
 			
 				} 
 			}   
