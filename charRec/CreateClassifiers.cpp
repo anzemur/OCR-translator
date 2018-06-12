@@ -38,6 +38,13 @@ int main() {
 								 'u', 'v', 'w', 'x', 'y', 'z' };
 	
 
+	/* Init matrices for image processing */
+	Mat trainImg;
+	Mat matGrayscale;
+	Mat matBlurred;
+	Mat matThreshold;
+	Mat matThresholdCopy;
+
 
 	/* Iterate trough folder and save images to the classification files*/
 	for (int i = 0; i <= NUMBER_OF_CHARS; i++) {
@@ -54,13 +61,6 @@ int main() {
 			path.append(to_string(j));
 			path.append(".png");
 
-
-			/* Init matrices for image processing */
-			Mat trainImg;        
-			Mat matGrayscale;               
-			Mat matBlurred;                 
-			Mat matThreshold;                  
-			Mat matThresholdCopy;              
 		       
 			vector<Vec4i> v4iHierarchy;  
 			vector<vector<Point> > potencialContours;
@@ -136,6 +136,11 @@ int main() {
 
 	}
 
+	trainImg.release();
+	matGrayscale.release();
+	matBlurred.release();
+	matThreshold.release();
+	matThresholdCopy.release();
 
 
 	FileStorage fileStorageImages("images.xml", FileStorage::WRITE);
@@ -174,7 +179,11 @@ int main() {
 
                                                
 	cout << "Images trained!\n\n";
-	int c = waitKey(0);
+
+	classificationInts.release();
+	imagesFloats.release();
+
+	waitKey(0);
 
     return(0);
 }
