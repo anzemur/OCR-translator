@@ -3,6 +3,9 @@ Android app that with the help of OpenCV (using SVM algorithm) detects the text 
 
 </br>
 
+[![Demo](https://j.gifs.com/gLq3nY.gif)]()
+
+
 ## Feautures
 
 * Take a photo with camera and extract whole block of text, line or a word from it. You can translate that text to a choosen language. 
